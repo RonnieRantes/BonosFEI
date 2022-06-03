@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <meta charset="UTF-8"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1">   
+        <title>Cálculo de bonos</title>
+		<link rel="icon" href="/img/icon_pagina.png">
+        <link href="http://fonts.cdnfonts.com/css/lexend-deca" rel="stylesheet">
+        <link href="/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"></link>
+        <link href="/css/calculo.css" rel="stylesheet" id="general-css"></link>
+		<link href="/css/dataTables.bootstrap4.min.css" rel="stylesheet"></link>
+		<script src="/js/jquery.validate.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/jquery.dataTables.min.js"></script>
+		<script src="/js/dataTables.bootstrap4.min.js"></script>
+    </head>
+    <body>
+    	<div sec:authorize="isAuthenticated()" th:replace="fragments/navbar :: nav"></div>
+        <form class="container cont1" style="margin-top: 0%;" th:action="@{/bonos/resultado}" method="post" th:object="${operacion}">
+			<div class="calc">
+				<input type="hidden" th:field="*{idOperacion}" class="form-control dos text-center"/>    
+				<!--Valores-->
+				<div class="col-sm-6 rect1">
+					<div class="calc1">
+						<div class="col-sm-6 coltexto">
+							<h3>Valor Nominal</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="1" th:field="*{nominal}" class="form-control dos text-center" autofocus required/>    
+						</div>
+					</div>
+					<div class="calc1">
+						<div class="col-sm-6 coltexto center">
+							<h3>Valor Comercial</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="1" th:field="*{comercial}" class="form-control dos text-center" required/>    
+						</div>
+					</div>				
+				</div>
+				<!--Tasas-->
+				<!-- Tasa Efectiva -->
+				<div th:if="${user.tipoTasa.getIdTipoTasa()} == 1" class="col-sm-6 rect1">
+					<div class="calc1">
+						<div class="col-sm-6 coltexto">
+							<h3>Tasa interés (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{tasaInteres}" class="form-control dos text-center" required/>    
+						</div>
+					</div>
+					<div class="calc1">
+						<div class="col-sm-6 coltexto">
+							<h3>Tasa anual de descuento (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{tasaDescuento}" class="form-control dos text-center" required/>    
+						</div>
+					</div>
+				</div>
+				<!-- Tasa Nominal -->
+				<div th:if="${user.tipoTasa.getIdTipoTasa()} == 2" class="col-sm-6 rect1">
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Tasa interés (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{tasaInteres}" class="form-control text-center" required/>    
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Capitalización</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+	                        <select class="form-control text-center" th:field="*{capitalizacion.idFrecuencia}">
+								<option th:each="f: ${frecuenciasCapitalizacion}"
+									th:value="${f.idFrecuencia}"
+									th:text="${f.nombre}"
+									th:selected="(${f.idFrecuencia} == *{capitalizacion.idFrecuencia})">
+								</option>	
+							</select>
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Tasa anual de descuento (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{tasaDescuento}" class="form-control text-center" required/>    
+						</div>
+					</div>
+				</div>
+				<!--Tiempo-->
+				<div class="col-sm-6 rect1">
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Emisión</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="date" th:field="*{fechaEmision}" class="form-control text-center" required />    
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>N° de años</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" th:field="*{anios}" min="1" step="1" class="form-control text-center" required/>    
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Frecuencia de bono</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+	                        <select class="form-control text-center" th:field="*{frecuencia.idFrecuencia}">
+								<option th:each="f: ${frecuenciasBono}"
+									th:value="${f.idFrecuencia}"
+									th:text="${f.nombre}"
+									th:selected="(${f.idFrecuencia} == *{frecuencia.idFrecuencia})">
+								</option>	
+							</select>
+						</div>
+					</div>
+				</div>
+				<!--Costos iniciales-->
+				<div class="col-sm-6 rect2">
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Prima (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{prima}" class="form-control text-center" required/>    
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Flotación (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{flotacion}" class="form-control text-center" required/>    
+						</div>
+					</div>
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>CAVALI (%)</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+							<input type="number" min="0" step="any" th:field="*{cavali}" class="form-control text-center" required/>    
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="calc3">
+				<div style="overflow-y: auto" class="col-sm-6 rect3">
+					<table class="table table-hover table-striped" id="tab_logic" style="width: 100%;">
+						<thead>
+							<tr>
+								<th class="text-center">N°</th>
+								<th class="text-center">FECHA</th>
+								<th class="text-center">P. GRACIA</th>
+								<th class="text-center">S. INICIAL</th>
+								<th class="text-center">INTERÉS</th>
+								<th class="text-center">CUOTA</th>
+								<th class="text-center">ARMOT.</th>
+								<th class="text-center">PRIMA</th>
+								<th class="text-center">S. FINAL</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="bono, itemStat: *{listaBonos}">
+								<td th:text="*{listaBonos[__${itemStat.index}__].numero}" class="text-center celda"></td>
+								<td th:text="*{#dates.format(listaBonos[__${itemStat.index}__].fechaProgramada, 'dd/MM/yyyy')}" class="text-center celda"></td>
+								<td>
+									<select style="width: 100%; height: 100%; text-align: center; padding-left: 7px;" th:field="*{listaBonos[__${itemStat.index}__].plazoGracia}">
+			    						<option style="text-align: center;" th:value="T" th:text="T"></option>  
+			    						<option style="text-align: center;" th:value="P" th:text="P"></option>  
+			    						<option style="text-align: center;" th:value="S" th:text="S" th:selected="selected"></option>  
+			    					</select>     	
+								</td>
+								<td th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sSaldoInicial()}" class="text-center celda"></td>
+								<td th:if="*{listaBonos[__${itemStat.index}__].interes} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sInteres()}" class="text-center celda error"></td>
+								<td th:unless="*{listaBonos[__${itemStat.index}__].interes} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sInteres()}" class="text-center celda"></td>
+								<td th:if="*{listaBonos[__${itemStat.index}__].cuota} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sCuota()}" class="text-center celda error"></td>
+								<td th:unless="*{listaBonos[__${itemStat.index}__].cuota} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sCuota()}" class="text-center celda"></td>
+								<td th:if="*{listaBonos[__${itemStat.index}__].amortizacion} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sAmortizacion()}" class="text-center celda error"></td>
+								<td th:unless="*{listaBonos[__${itemStat.index}__].amortizacion} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sAmortizacion()}" class="text-center celda"></td>
+								<td th:if="*{listaBonos[__${itemStat.index}__].prima} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sPrima()}" class="text-center celda error"></td>
+								<td th:unless="*{listaBonos[__${itemStat.index}__].prima} < 0" th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sPrima()}" class="text-center celda"></td>
+								<td th:text="${moneda} + *{listaBonos[__${itemStat.index}__].sSaldoFinal()}" class="text-center celda"></td>
+							</tr>
+						</tbody>
+					</table> 	
+				</div>
+				<div class="col-sm-6 sec1">
+					<div class="rect4">
+						<div class="fila4">
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">TEA</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sTEA()} + '%'" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">TEP</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sTEP()} + '%'" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">COK</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sCOK()} + '%'" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+						</div>
+						<div class="fila4 fila5">
+							<div class="col-sm-6 calc9">
+								<h3 class="centrado">COSTES INICIALES</h3>
+								<h3 th:if="${moneda}" th:text="${moneda} + ${operacion.CostesIniciales()}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc9">
+								<h3 class="centrado">N° DE PERÍODOS</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.periodos}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+						</div>						
+					</div>	
+					<div class="rect5">
+						<div class="fila2">
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">VAN</h3>
+								<div th:if="${moneda}">
+									<h3 th:if="${operacion.vna} > 0" style="color: green;" th:text="${moneda} + ${operacion.sVna()}" class="centrado2"></h3>
+									<h3 th:if="${operacion.vna} == 0" th:text="$${moneda} + {operacion.sVna()}" class="centrado2"></h3>
+									<h3 th:if="${operacion.vna} < 0" style="color: red;" th:text="${moneda} + ${operacion.sVna()}" class="centrado2"></h3>								
+								</div>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">B/C</h3>
+								<div th:if="${moneda}">
+									<h3 th:if="${operacion.bc} > 1" style="color: green;" th:text="${operacion.sBc()}" class="centrado2"></h3>
+									<h3 th:if="${operacion.bc} == 1" th:text="${operacion.sBc()}" class="centrado2"></h3>
+									<h3 th:if="${operacion.bc} < 1" style="color: red;" th:text="${operacion.sBc()}" class="centrado2"></h3>
+								</div>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">TIR</h3>
+								<div th:if="${moneda}">
+									<div th:if="${operacion.sTir()}=='-'">
+										<h3 class="centrado2">-</h3>
+									</div>
+									<div th:unless="${operacion.sTir()}=='-'">
+										<h3 th:if="${operacion.tir} > ${operacion.COK}" style="color: green;" th:text="${operacion.sTir()} + '%'" class="centrado2"></h3>
+										<h3 th:if="${operacion.tir} == ${operacion.COK}" th:text="${operacion.sTir()} + '%'" class="centrado2"></h3>
+										<h3 th:if="${operacion.tir} < ${operacion.COK}" style="color: red;" th:text="${operacion.sTir()} + '%'" class="centrado2"></h3>														
+									</div>
+								</div>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+						</div>
+						<div class="fila2">
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">TREA</h3>
+								<div th:if="${moneda}">
+									<div th:if="${operacion.sTrea()}=='-'">
+										<h3 class="centrado2">-</h3>
+									</div>
+									<div th:unless="${operacion.sTrea()}=='-'">
+										<h3 th:text="${operacion.sTrea()} + '%'" class="centrado2"></h3>
+									</div>								
+								</div>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">PRD</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.prd}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc8">
+								<h3 class="centrado">CONVEX.</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sConvexidad()}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+						</div>
+						<div class="fila2">
+							<div class="col-sm-6 calc9">
+								<h3 class="centrado">DURACIÓN</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sDuracion()}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+							<div class="col-sm-6 calc9">
+								<h3 class="centrado">DURACIÓN M.</h3>
+								<h3 th:if="${moneda}" th:text="${operacion.sDuracionModificada}" class="centrado2"></h3>
+								<h3 th:unless="${moneda}" class="centrado2">-</h3>
+							</div>
+						</div>
+					</div>	
+					<div class="sec3">
+						<div class="col-sm-6 colboton" style="margin-right: 4%;">
+							<button class="btn btn-primary">Calcular</button>
+						</div>
+						<div class="col-sm-6 colboton">
+							<a class="btn btn-primary btninvertido" href="/inicio/">Regresar</a>  
+						</div>
+					</div>	
+				</div>
+			</div>
+			<!--<div class="form-group row registro">
+				<input type="submit" class="btn btn-primary" value="Iniciar sesión">  
+			</div>-->
+            <div class="form-group row registro" style="margin-top: 3%;">
+                <h4 th:text="${mensaje}" class="error"></h4>
+            </div>
+        </form>
+    	<div th:replace="fragments/footer :: footer"></div>
+		<script>$('#tab_logic').DataTable({ info: false, searching: false, lengthChange: false, pageLength: 10000, 
+		dom: 't', language: { emptyTable: "Complete los campos para calcular los bonos"} });</script>
+	</body>
+</html>

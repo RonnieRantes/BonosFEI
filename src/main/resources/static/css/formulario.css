@@ -1,0 +1,92 @@
+html{
+	height: 100%;
+}
+body{
+	height: 86%;
+}
+.cont1{
+	height: 100%;
+}
+.col-sm-6{
+	width:50%;
+}
+.form-control{
+	margin-top: 0%;
+}
+.colinput{
+	width:60%;
+	padding: 0px;
+	height: 100%;
+    display: flex;
+    align-items: center;
+}
+.coltexto{
+	width:40%;
+	padding: 0px;
+	margin-top: 0px;
+	height: 100%;
+    display: flex;
+    align-items: center;
+}
+.colajustes{
+	width:50%;
+	padding: 0px;
+	margin-top: 0px;
+}
+.derecha{
+	text-align: right;
+}
+.izquierda{
+	text-align: left;
+}
+h3{
+	text-align: left !important;
+	margin: 0px;
+	font-size: 20px;
+}
+.perfil{
+	width:50%;
+	margin-bottom: 1.5%;
+	display: flex;
+    align-items: center;
+}
+.perfil2{
+	width:50%;
+	margin-bottom: 2.7%;
+    display: flex;
+    align-items: center;
+}
+.btn-primary {
+	background-color: #4DE599 ; 
+	color: #224957;
+	border: 0px;
+	text-align: center;
+	font-size: 15pt;	
+	width: 100%;
+	margin-top: 5%;
+}
+.btninvertido{
+	background-color: #224957 ; 
+	color: #4DE599;
+	border: 0px;
+	text-align: center;
+	font-size: 15pt;	
+	width: 100%;
+	margin-top: 5%;
+}
+h5{
+	font-size: 16px;
+}
+.btnajustes{
+	width: 90%;
+}
+.error{
+	color:rgb(215, 41, 41);
+}
+input:invalid {
+	border: 2px solid rgb(215, 41, 41);
+}
+input:focus {
+	border: 2px solid #4DE599;
+}
+

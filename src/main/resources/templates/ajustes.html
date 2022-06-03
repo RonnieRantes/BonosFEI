@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <meta charset="UTF-8"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <title>Ajustes</title>
+		<link rel="icon" href="/img/icon_pagina.png">
+        <link href="http://fonts.cdnfonts.com/css/lexend-deca" rel="stylesheet">
+        <link href="/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"></link>
+        <link href="/css/general.css" rel="stylesheet" id="general-css"></link>
+		<link href="/css/formulario.css" rel="stylesheet" id="general-css"></link>
+    </head>
+    <body>
+    	<div th:replace="fragments/navbar :: nav"></div>
+    	<form class="container cont1" th:action="@{/registro/registrar}" method="post" th:object="${usuario}">
+				<div class="form-group row perfil" style="margin-bottom: 4%;">
+					<h1 th:text="${titulo}"></h1>
+				</div>
+				<input class="form-control text-center" type="hidden" th:field="*{correoUsuario}"/>   
+				<input class="form-control text-center" type="hidden" th:field="*{contrasenia}"/>     
+				<input class="form-control text-center" type="hidden" th:field="*{nombres}" maxlength="50" required />    
+				<input class="form-control text-center" type="hidden" th:field="*{apellidos}" maxlength="50" required/>    
+				<div class="perfil2" >
+					<div class="col-sm-6 coltexto">
+						<h3>Moneda:</h3>
+					</div>
+                    <div class="col-sm-6 colinput">
+                        <select class="form-control text-center" th:field="*{moneda.idMoneda}">
+							<option th:each="m: ${listaMonedas}"
+								th:value="${m.idMoneda}"
+								th:text="${m.nombre} + ' (' + ${m.simbolo} + ')'"
+								th:selected="(${m.idMoneda} == *{moneda.idMoneda})">
+							</option>	
+						</select>
+					</div>
+				</div>
+				<div class="perfil2">
+					<div class="col-sm-6 coltexto">
+						<h3>Tipo de tasa:</h3>
+					</div>
+                    <div class="col-sm-6 colinput">
+                    	<select class="form-control text-center" th:field="*{tipoTasa.idTipoTasa}">
+							<option style="padding-right: 50px;" th:each="t: ${listaTipoTasas}"
+								th:value="${t.idTipoTasa}"
+								th:text="${t.nombre}"
+								th:selected="(${t.idTipoTasa} == *{tipoTasa.idTipoTasa})">
+							</option>	
+						</select>
+					</div>
+				</div>
+				<div class="form-group row perfil" style="margin-top: 1%;">
+					<div class="col-sm-6 colajustes izquierda">
+						<a onclick="history.back()" class="btn btninvertido btnajustes">Cancelar</a>
+					</div>
+					<div class="col-sm-6 colajustes derecha">
+						<button type="submit" class="btn btn-primary btnajustes" th:text="${btn}"></button>  
+					</div>
+				</div>
+                <h4 th:text="${mensaje}" class="error"></h4>
+    	</form>
+    	
+    	<div th:replace="fragments/footer :: footer"></div>
+    </body>
+</html>

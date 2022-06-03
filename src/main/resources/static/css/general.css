@@ -1,0 +1,93 @@
+*{
+	font-family: Lexend Deca;
+}
+h1{
+	font-size: 50px;
+	text-align: center;
+	color: #224957;
+	width:100%;
+}
+.cont1 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 80%;
+}
+.form-group{
+	text-align: center;
+	justify-content: center;
+    align-items: center;
+}
+.form-control{
+	height: 40px;
+	margin-top: 5%;
+	background-color: #224957;
+	color: white;
+}
+
+.btn-primary {
+	background-color: #4DE599 ; 
+	color: #224957;
+	border: 0px;
+	text-align: center;
+	font-size: 15pt;	
+	width: 100%;
+	margin-top: 8%;
+}
+.error{
+	color:rgb(215, 41, 41);
+}
+.circulo{
+	border-radius: 100%;
+	width: 200px;
+	height: 200px;
+	padding-right: 6%;
+}
+.circuloadmin{
+	border-radius: 100%;
+	width: 130px;
+	height: 130px;
+}
+.imgcirculo{
+	width:120px;
+	margin-left:10%;
+}
+.imgcirculoadmin{
+	width:75px;
+	margin-left:4%;
+}
+.txtcirculos{
+	margin-bottom: 0%;
+	margin-top: 5%;
+}
+.login{
+	width:25%;
+}
+.center {
+    margin: 0 auto;
+    width: 80%;
+}
+.col-sm-6{
+	width:50%;
+}
+.coladmin{
+	width:25%;
+}
+
+#input_container { 
+    position:relative;
+    padding:0;
+    margin:0;
+}
+#input { 
+    height:20px;
+    margin:0;
+    padding-left:30px;
+}
+#input_img {
+    position:absolute;
+    bottom:8px;
+    left:10px;
+    width:10px;
+    height:10px;
+}
