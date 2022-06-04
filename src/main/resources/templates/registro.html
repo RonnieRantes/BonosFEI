@@ -15,11 +15,40 @@
 			<div class="form-group row perfil" style="margin-bottom: 4%;">
 				<h1 th:text="${titulo}"></h1>
 			</div>
-			<input class="form-control text-center" type="hidden" th:field="*{correoUsuario}"/>   
-			<input class="form-control text-center" type="hidden" th:field="*{contrasenia}"/>     
-			<input class="form-control text-center" type="hidden" th:field="*{nombres}" maxlength="50" required />    
-			<input class="form-control text-center" type="hidden" th:field="*{apellidos}" maxlength="50" required/>    
-			<div class="perfil2" >
+			<div class="perfil">
+				<div class="col-sm-6 coltexto">
+					<h3>Correo:</h3>
+				</div>
+                <div class="col-sm-6 colinput">
+					<input type="email" th:field="*{correoUsuario}" class="form-control text-center"/>    
+				</div>
+			</div>
+			<div class="perfil">
+				<div class="col-sm-6 coltexto">
+					<h3>Nombres:</h3>
+				</div>
+                <div class="col-sm-6 colinput">
+					<input class="form-control text-center" type="text" th:field="*{nombres}" maxlength="50" required/>    
+				</div>
+			</div>
+			<div class="perfil">
+				<div class="col-sm-6 coltexto">
+					<h3>Apellidos:</h3>
+				</div>
+                <div class="col-sm-6 colinput">
+					<input class="form-control text-center" type="text" th:field="*{apellidos}" maxlength="50" required/>    
+				</div>
+			</div>
+			<div class="perfil">
+				<div class="col-sm-6 coltexto">
+					<h3>Contraseña:</h3>
+				</div>
+                <div class="col-sm-6 colinput">
+					<input type="password" th:field="*{contrasenia}" class="form-control text-center" required/>    
+				</div>
+			</div>
+
+			<div class="perfil2" hidden="hidden">
 				<div class="col-sm-6 coltexto">
 					<h3>Moneda:</h3>
 				</div>
@@ -33,7 +62,7 @@
 					</select>
 				</div>
 			</div>
-			<div class="perfil2">
+			<div class="perfil2" hidden="hidden">
 				<div class="col-sm-6 coltexto">
 					<h3>Tipo de tasa:</h3>
 				</div>
