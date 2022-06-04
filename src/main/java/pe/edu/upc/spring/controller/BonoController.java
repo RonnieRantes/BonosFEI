@@ -60,6 +60,7 @@ public class BonoController {
 				objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
 				cmpbOperacion = oService.registrar(objO);
 				objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null);
+				objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null));
 			}
 			//SIGUIENTES CÁLCULOS
 			else {
@@ -68,6 +69,7 @@ public class BonoController {
 					objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
 					cmpbOperacion = oService.registrar(objO);
 					objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), objO.getListaBonos());
+					objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), objO.getListaBonos()));
 				}
 				//CAMBIO EN DATOS ENTRADA
 				else{
@@ -75,9 +77,9 @@ public class BonoController {
 					objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
 					cmpbOperacion = oService.registrar(objO);
 					objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null);
+					objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null));
 				}
 			}
-			objOperacion.setListaBonos(bService.bonosOperacion(objOperacion.getIdOperacion()));
 			model.addAttribute("operacion", objOperacion);
 			model.addAttribute("listaBonos", objOperacion.getListaBonos());
 			//default

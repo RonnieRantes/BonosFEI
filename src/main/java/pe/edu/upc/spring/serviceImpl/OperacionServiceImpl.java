@@ -93,8 +93,6 @@ public class OperacionServiceImpl implements IOperacionService {
 		long auxx;
 		String pGracia;
 
-		limpiarBonos(objO.getIdOperacion());
-
 		for(int i = 1; i <= objO.getPeriodos(); i++) {
 			
 			//Fecha Emisión
@@ -151,7 +149,6 @@ public class OperacionServiceImpl implements IOperacionService {
 			FC = FA * i * (1 + i);
 			
 			Bono objBono = new Bono(0, i, objO, pGracia, fechaBono, sInicial, interes, cuota, amort, prima, sFinal, flujo, FA, FAP, FC);
-			dBono.save(objBono);
 			lst.add(objBono);
 		}
 
