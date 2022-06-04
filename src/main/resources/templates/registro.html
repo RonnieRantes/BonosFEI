@@ -11,7 +11,6 @@
 		<link href="/css/formulario.css" rel="stylesheet" id="general-css"></link>
     </head>
     <body>
-    	<div th:replace="fragments/navbar :: nav"></div>    	
     	<form class="container cont1" th:action="@{/registro/registrar}" method="post" th:object="${usuario}">
 			<div class="form-group row perfil" style="margin-bottom: 4%;">
 				<h1 th:text="${titulo}"></h1>
