@@ -12,10 +12,10 @@
     </head>
     <body>
     	<form class="container cont1" th:action="@{/registro/registrar}" method="post" th:object="${usuario}">
-			<div class="form-group row perfil" style="margin-bottom: 4%; margin-top: -5%;">
+			<div class="form-group row perfil" style="margin-bottom: 4%; padding-top: -5%;">
 				<h1 th:text="${titulo}"></h1>
 			</div>
-			<div class="perfil">
+			<div class="perfil2">
 				<div class="col-sm-6 coltexto">
 					<h3>Correo:</h3>
 				</div>
@@ -23,7 +23,7 @@
 					<input type="email" th:field="*{correoUsuario}" class="form-control text-center"/>    
 				</div>
 			</div>
-			<div class="perfil">
+			<div class="perfil2">
 				<div class="col-sm-6 coltexto">
 					<h3>Nombres:</h3>
 				</div>
@@ -31,7 +31,7 @@
 					<input class="form-control text-center" type="text" th:field="*{nombres}" maxlength="50" required/>    
 				</div>
 			</div>
-			<div class="perfil">
+			<div class="perfil2">
 				<div class="col-sm-6 coltexto">
 					<h3>Apellidos:</h3>
 				</div>
@@ -39,7 +39,7 @@
 					<input class="form-control text-center" type="text" th:field="*{apellidos}" maxlength="50" required/>    
 				</div>
 			</div>
-			<div class="perfil">
+			<div class="perfil2">
 				<div class="col-sm-6 coltexto">
 					<h3>Contraseña:</h3>
 				</div>
