@@ -35,7 +35,7 @@ public class RegistroController {
 	private PasswordEncoder encoder;
 		
 	@RequestMapping("/")
-	public String irPaginaRegistro(Model model) {
+	public String irPaginaRegistro(Model model) throws ParseException{
 		model.addAttribute("usuario", new Usuario());
 		model.addAttribute("listaMonedas", mService.listar());
 		model.addAttribute("listaTipoTasas", tService.listar());
