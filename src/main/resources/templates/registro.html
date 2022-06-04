@@ -47,35 +47,20 @@
 					<input type="password" th:field="*{contrasenia}" class="form-control text-center" required/>    
 				</div>
 			</div>
-
-			<div class="perfil2" hidden="hidden">
-				<div class="col-sm-6 coltexto">
-					<h3>Moneda:</h3>
-				</div>
-                   <div class="col-sm-6 colinput">
-                       <select class="form-control text-center" th:field="*{moneda.idMoneda}">
-						<option th:each="m: ${listaMonedas}"
-							th:value="${m.idMoneda}"
-							th:text="${m.nombre} + ' (' + ${m.simbolo} + ')'"
-							th:selected="(${m.idMoneda} == *{moneda.idMoneda})">
-						</option>	
-					</select>
-				</div>
-			</div>
-			<div class="perfil2" hidden="hidden">
-				<div class="col-sm-6 coltexto">
-					<h3>Tipo de tasa:</h3>
-				</div>
-                   <div class="col-sm-6 colinput">
-                   	<select class="form-control text-center" th:field="*{tipoTasa.idTipoTasa}">
-						<option style="padding-right: 50px;" th:each="t: ${listaTipoTasas}"
-							th:value="${t.idTipoTasa}"
-							th:text="${t.nombre}"
-							th:selected="(${t.idTipoTasa} == *{tipoTasa.idTipoTasa})">
-						</option>	
-					</select>
-				</div>
-			</div>
+			<select class="form-control text-center" th:field="*{moneda.idMoneda}" hidden>
+				<option th:each="m: ${listaMonedas}"
+					th:value="${m.idMoneda}"
+					th:text="${m.nombre} + ' (' + ${m.simbolo} + ')'"
+					th:selected="(${m.idMoneda} == *{moneda.idMoneda})">
+				</option>	
+			</select>			
+			<select class="form-control text-center" th:field="*{tipoTasa.idTipoTasa}" hidden>
+				<option style="padding-right: 50px;" th:each="t: ${listaTipoTasas}"
+					th:value="${t.idTipoTasa}"
+					th:text="${t.nombre}"
+					th:selected="(${t.idTipoTasa} == *{tipoTasa.idTipoTasa})">
+				</option>	
+			</select>
 			<div class="form-group row perfil" style="margin-top: 1%;">
 				<div class="col-sm-6 colajustes izquierda">
 					<a onclick="history.back()" class="btn btninvertido btnajustes">Cancelar</a>
@@ -84,7 +69,7 @@
 					<button type="submit" class="btn btn-primary btnajustes" th:text="${btn}"></button>  
 				</div>
 			</div>
-               <h4 th:text="${mensaje}" class="error"></h4>
+            <h4 th:text="${mensaje}" class="error"></h4>
     	</form>
     	<div th:replace="fragments/footer :: footer"></div>
     </body>
