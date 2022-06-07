@@ -9,10 +9,10 @@ public interface IOperacionService {
 	Operacion buscarId(int idOperacion);
 	Operacion registrar(Operacion objO);
 	void eliminar(int idOperacion);
-	Operacion ultimaOperacion(String correoUsuario);
-	boolean compararOperaciones(Operacion objO1, Operacion objO2);
-	void limpiarBonos(int idOperacion);
-	List<Bono> CalcularBonos(Operacion objO, int idTipoTasa, List<Bono> lstBonos);
-	Operacion CalcularIndicadores(int idOperacion, int idTipoTasa, List<Bono> lstBonos);
+	void limpiar(String correoUsuario);
 	List<Operacion> operacionesUsuario(String correoUsuario);
+	boolean compararOperaciones(Operacion objO1, Operacion objO2);
+	Operacion CalcularIntermedios(Operacion objO, String tipoTasa);
+	List<Bono> CalcularBonos(Operacion objO, List<Bono> lstBonos);
+	Operacion CalcularIndicadores(Operacion objO, List<Bono> lstBonos);
 }

@@ -22,26 +22,37 @@
 				<input type="hidden" th:field="*{idOperacion}" class="form-control dos text-center"/>    
 				<!--Valores-->
 				<div class="col-sm-6 rect1">
-					<div class="calc1">
+					<div class="calc2">
+						<div class="col-sm-6 coltexto">
+							<h3>Dias x año</h3>
+						</div>
+						<div class="col-sm-6 colinput">
+	                        <select class="form-control text-center" th:field="*{diasAnio}">
+	    						<option style="text-align: center;" th:value="360" th:text="360"></option>  
+	    						<option style="text-align: center;" th:value="365" th:text="365" th:selected="selected"></option>  
+	    					</select>     	
+						</div>
+					</div>					
+					<div class="calc2">
 						<div class="col-sm-6 coltexto">
 							<h3>Valor Nominal</h3>
 						</div>
 						<div class="col-sm-6 colinput">
-							<input type="number" min="1" th:field="*{nominal}" class="form-control dos text-center" autofocus required/>    
+							<input type="number" min="1" th:field="*{nominal}" class="form-control text-center" autofocus required/>    
 						</div>
 					</div>
-					<div class="calc1">
+					<div class="calc2">
 						<div class="col-sm-6 coltexto center">
 							<h3>Valor Comercial</h3>
 						</div>
 						<div class="col-sm-6 colinput">
-							<input type="number" min="1" th:field="*{comercial}" class="form-control dos text-center" required/>    
+							<input type="number" min="1" th:field="*{comercial}" class="form-control text-center" required/>    
 						</div>
 					</div>				
 				</div>
 				<!--Tasas-->
 				<!-- Tasa Efectiva -->
-				<div th:if="${user.tipoTasa.getIdTipoTasa()} == 1" class="col-sm-6 rect1">
+				<div th:if="${user.tipoTasa.equals('Efectiva')}" class="col-sm-6 rect1">
 					<div class="calc1">
 						<div class="col-sm-6 coltexto">
 							<h3>Tasa interés (%)</h3>
@@ -60,7 +71,7 @@
 					</div>
 				</div>
 				<!-- Tasa Nominal -->
-				<div th:if="${user.tipoTasa.getIdTipoTasa()} == 2" class="col-sm-6 rect1">
+				<div th:unless="${user.tipoTasa.equals('Efectiva')}" class="col-sm-6 rect1">
 					<div class="calc2">
 						<div class="col-sm-6 coltexto">
 							<h3>Tasa interés (%)</h3>

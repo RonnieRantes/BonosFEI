@@ -2,7 +2,6 @@ package pe.edu.upc.spring.serviceImpl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.apache.poi.ss.formula.functions.*;
 
 import pe.edu.upc.spring.model.Bono;
-import pe.edu.upc.spring.model.Frecuencia;
 import pe.edu.upc.spring.model.Operacion;
-import pe.edu.upc.spring.repository.IBonoRepository;
 import pe.edu.upc.spring.repository.IOperacionRepository;
 import pe.edu.upc.spring.service.IFrecuenciaService;
 import pe.edu.upc.spring.service.IOperacionService;
@@ -26,8 +23,6 @@ public class OperacionServiceImpl implements IOperacionService {
 	@Autowired
 	private IOperacionRepository dOperacion;
 	@Autowired
-	private IBonoRepository dBono;
-	@Autowired
 	private IFrecuenciaService fService;
 	
 	@Override
@@ -37,42 +32,44 @@ public class OperacionServiceImpl implements IOperacionService {
 		Operacion objOperacion = dOperacion.save(objO);
 		return objOperacion;
 	}
+	
+	@Override
+	@Transactional
+	public void eliminar(int idOperacion) {
+		dOperacion.deleteById(idOperacion);
+	}
+	
+	@Override
+	@Transactional
+	public void limpiar(String correoUsuario) {
+		for(Operacion o: operacionesUsuario(correoUsuario))eliminar(o.getIdOperacion());
+	}
 
 	@Override
 	@Transactional(readOnly=true)
-	public Operacion ultimaOperacion(String correoUsuario) {
-		List<Operacion> lst = dOperacion.operacionesUsuario(correoUsuario);
-		for(int i = 0; i < lst.size(); i++) {
-			if(i == lst.size()-1) return lst.get(i);
-		}
-		return null;
+	public List<Operacion> operacionesUsuario(String correoUsuario) {
+		return dOperacion.operacionesUsuario(correoUsuario);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public boolean compararOperaciones(Operacion objO1, Operacion objO2) {
 		if(objO1 == null || objO2 == null)return false;
+		if(objO1.getDiasAnio() != objO2.getDiasAnio())return false;
 		if(objO1.getNominal() != objO2.getNominal())return false;
 		if(objO1.getComercial() != objO2.getComercial())return false;
 		if(objO1.getTasaInteres() != objO2.getTasaInteres())return false;
 		if(objO1.getTasaDescuento() != objO2.getTasaDescuento())return false;
 		if(objO1.getFechaEmision().getTime() != objO2.getFechaEmision().getTime())return false;
 		if(objO1.getAnios() != objO2.getAnios())return false;
-		if(objO1.getCapitalizacion() != null && objO1.getCapitalizacion().getIdFrecuencia() != objO2.getCapitalizacion().getIdFrecuencia())return false;
+		if(objO1.getCapitalizacion() != null && objO2.getCapitalizacion() != null && objO1.getCapitalizacion().getIdFrecuencia() != objO2.getCapitalizacion().getIdFrecuencia())return false;
 		if(objO1.getFrecuencia().getIdFrecuencia() != objO2.getFrecuencia().getIdFrecuencia())return false;
 		if(objO1.getPrima() != objO2.getPrima())return false;
 		if(objO1.getFlotacion() != objO2.getFlotacion())return false;
 		if(objO1.getCavali() != objO2.getCavali())return false;
 		return true;
 	}
-
-	@Override
-	@Transactional
-	public void limpiarBonos(int idOperacion) {
-		List<Bono> lst = dBono.bonosOperacion(idOperacion);
-		for(Bono b : lst) { dBono.deleteById(b.getIdBono()); }
-	}
-
+	
 	@Override
 	@Transactional(readOnly=true)
 	public Operacion buscarId(int idOperacion) {
@@ -85,18 +82,44 @@ public class OperacionServiceImpl implements IOperacionService {
 	}
 	
 	@Override
-	@Transactional
-	public List<Bono> CalcularBonos(Operacion objO, int idTipoTasa, List<Bono> lstBonos) {
-		List<Bono> lst = new ArrayList<Bono>();
+	@Transactional(readOnly=true)
+	public Operacion CalcularIntermedios(Operacion objO, String tipoTasa) {
+		double tea, tep, COK;
+		int tPeriodos, frecuenciaCap, frecuenciaBono = fService.buscarId(objO.getFrecuencia().getIdFrecuencia()).getDias(); 
+
+		//PERIODOS
+		tPeriodos = objO.getDiasAnio() / frecuenciaBono * objO.getAnios();
+		objO.setPeriodos(tPeriodos);
+		
+		//COK
+		COK = Math.pow((double)1 + objO.getTasaDescuento()/100, (double)frecuenciaBono / (double)objO.getDiasAnio()) - (double)1;
+		objO.setCOK(COK);
+		
+		//TEA
+		if(tipoTasa.equals("Efectiva")) tea = objO.getTasaInteres() / 100; //EFECTIVA
+		else{
+			frecuenciaCap = objO.getDiasAnio()/fService.buscarId(objO.getCapitalizacion().getIdFrecuencia()).getDias();
+			tea = Math.pow(1 + objO.getTasaInteres()/(100 * frecuenciaCap), frecuenciaCap)-1; //NOMINAL
+		}
+		objO.setTEA(tea);
+		
+		//TEP
+		tep = Math.pow(1 + tea, (double)frecuenciaBono / (double)objO.getDiasAnio())-1;
+		objO.setTEP(tep);
+
+		return objO;
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public List<Bono> CalcularBonos(Operacion objO, List<Bono> lst) {
 		double aux, sInicial, sFinal = 0, interes, cuota, amort, prima, flujo, FA, FAP, FC; 
-		int frecuenciaBono = objO.getFrecuencia().getDias();
+		int size = lst.size(), frecuenciaBono = fService.buscarId(objO.getFrecuencia().getIdFrecuencia()).getDias();
 		long auxx;
 		String pGracia;
-
-		limpiarBonos(objO.getIdOperacion());
-
+		System.out.println("----SIZE LST PRE: " + lst.size());
 		for(int i = 1; i <= objO.getPeriodos(); i++) {
-			
+			System.out.println("----i: " + i);
 			//Fecha Emisión
 			auxx = (long)i * (long)frecuenciaBono * (long)(24*60*60*1000);
 			Date fechaBono = new Date(objO.getFechaEmision().getTime() + auxx);
@@ -106,17 +129,19 @@ public class OperacionServiceImpl implements IOperacionService {
 			else sInicial = sFinal;
 			
 			//Plazo Gracia
-			if(lstBonos == null) pGracia = "S";
-			else pGracia = lstBonos.get(i-1).getPlazoGracia();
+			if(size ==0) pGracia = "S";
+			else pGracia = lst.get(i-1).getPlazoGracia();
 			
 			//Interes
 			interes = -1 * sInicial * objO.getTEP();
 						
 			//Cuota
 			if(pGracia.equals("S")) {
-				if(objO.getTEP() == 0)cuota=-1 * objO.getNominal()/objO.getPeriodos();
+				if(objO.getTEP() == 0) {
+					cuota = -1 * sInicial / (objO.getPeriodos() - i + 1);
+				}
 				else {
-					aux = Math.pow(1+objO.getTEP(),objO.getPeriodos()-i+1);
+					aux = Math.pow(1+objO.getTEP(),objO.getPeriodos() - i + 1);
 					cuota = -1 * sInicial * aux * objO.getTEP() / (aux - 1);
 				}
 			}
@@ -129,7 +154,7 @@ public class OperacionServiceImpl implements IOperacionService {
 			
 			//Prima
 			if(i == objO.getPeriodos()) {
-				if(objO.getPrima()==0) prima = 0;
+				if(objO.getPrima() == 0) prima = 0;
 				else prima = -1 * sInicial * objO.getPrima() / 100;
 			}
 			else prima = 0;
@@ -145,55 +170,30 @@ public class OperacionServiceImpl implements IOperacionService {
 			FA = flujo / Math.pow(1 + objO.getCOK(),i);
 			
 			//Flujo actual x plazo
-			FAP = FA * i * (double)frecuenciaBono / (double)360;
+			FAP = FA * i * (double)frecuenciaBono / (double)objO.getDiasAnio();
 			
 			//Factor p/ convexidad
 			FC = FA * i * (1 + i);
 			
-			Bono objBono = new Bono(0, i, objO, pGracia, fechaBono, sInicial, interes, cuota, amort, prima, sFinal, flujo, FA, FAP, FC);
-			dBono.save(objBono);
-			lst.add(objBono);
+			Bono objB = new Bono(i, pGracia, fechaBono, sInicial, interes, cuota, amort, prima, sFinal, flujo, FA, FAP, FC);
+			if(size == 0)lst.add(objB);
+			else lst.set(i-1, objB);
 		}
-
+		System.out.println("----SIZE LST DSPS: " + lst.size());
 		return lst;
 	}
 	
 	@Override
 	@Transactional
-	public Operacion CalcularIndicadores(int idOperacion, int idTipoTasa, List<Bono> lstBonos) {
-		Operacion objO = buscarId(idOperacion);
-		Frecuencia objF = fService.buscarId(objO.getFrecuencia().getIdFrecuencia());
-		double tea, tep, COK, sumaFA = 0, sumaFAP = 0, sumaFC = 0, convexidad, duracion, dModificada, tir, trea;
-		int prd=0, frecuenciaCap, frecuenciaBono = objF.getDias(), tPeriodos = 360 / frecuenciaBono * objO.getAnios();
-		
-		//PERIODOS
-		objO.setFrecuencia(objF);
-		objO.setPeriodos(tPeriodos);
-		
-		//COK
-		COK = Math.pow((double)1 + objO.getTasaDescuento()/100, (double)frecuenciaBono / (double)360) - (double)1;
-		objO.setCOK(COK);
-		
-		//TEA
-		if(idTipoTasa == 1) tea = objO.getTasaInteres() / 100; //EFECTIVA
-		else{
-			frecuenciaCap = 360/fService.buscarId(objO.getCapitalizacion().getIdFrecuencia()).getDias();
-			tea = Math.pow(1 + objO.getTasaInteres()/(100 * frecuenciaCap), frecuenciaCap)-1; //NOMINAL
-		}
-		objO.setTEA(tea);
-		
-		//TEP
-		tep = Math.pow(1 + tea, (double)frecuenciaBono / (double)360)-1;
-		objO.setTEP(tep);
-
-		//BONOS
-		List<Bono> lst = CalcularBonos(objO, idTipoTasa, lstBonos);
-		
+	public Operacion CalcularIndicadores(Operacion objO, List<Bono> lst) {
+		double sumaFA = 0, sumaFAP = 0, sumaFC = 0, convexidad, duracion, dModificada, tir, trea;
+		int prd = 0, frecuenciaBono = fService.buscarId(objO.getFrecuencia().getIdFrecuencia()).getDias();
+				
 		//FLUJOS
 		double[] flujos = new double[objO.getPeriodos()+1];
 		flujos[0] = -1 * objO.getComercial() + objO.CostesIniciales() * -1;
 		for(int i = 0; i < objO.getPeriodos(); i++) {
-			//Guardar flujos
+			//Recopilar flujos
 			flujos[i + 1] = lst.get(i).getFlujo();
 			//Sumar flujos
 			sumaFA+=lst.get(i).getFlujoActual();
@@ -211,7 +211,7 @@ public class OperacionServiceImpl implements IOperacionService {
 		objO.setTir(tir);
 		
 		//TREA
-		trea = Math.pow(1 + tir, 360/frecuenciaBono)-1;
+		trea = Math.pow(1 + tir, objO.getDiasAnio()/frecuenciaBono)-1;
 		objO.setTrea(trea);
 
 		//PRD
@@ -232,7 +232,7 @@ public class OperacionServiceImpl implements IOperacionService {
 		objO.setBc(sumaFA/(objO.getComercial() + objO.CostesIniciales()));
 				
 		//Convexidad
-		convexidad = sumaFC / (Math.pow(1 + objO.getCOK(),2) * sumaFA * Math.pow((double)360/(double)frecuenciaBono,2));
+		convexidad = sumaFC / (Math.pow(1 + objO.getCOK(),2) * sumaFA * Math.pow((double)objO.getDiasAnio()/(double)frecuenciaBono,2));
 		objO.setConvexidad(convexidad);
 		
 		//Duracion
@@ -245,17 +245,4 @@ public class OperacionServiceImpl implements IOperacionService {
 		
 		return objO;
 	}
-	
-	@Override
-	@Transactional(readOnly=true)
-	public List<Operacion> operacionesUsuario(String correoUsuario) {
-		return dOperacion.operacionesUsuario(correoUsuario);
-	}
-	
-	@Override
-	@Transactional
-	public void eliminar(int idOperacion) {
-		dOperacion.deleteById(idOperacion);
-	}
-
 }

@@ -26,6 +26,9 @@
 					<div class="col-sm-6 colttexto">
 						<h1>Historial de operaciones</h1>
 					</div>
+					<div class="col-sm-6 coltboton">
+						<a th:href="@{/limpiar/}" class="btn btn-primary">Limpiar</a>
+					</div>
 				</div>
 				<div class="perfil">
 					<table class="table table-hover table-striped">
@@ -48,7 +51,8 @@
 						</thead>
 						<tbody>
 							<tr th:each="o: ${listaOperaciones}">
-								<td class="text-center celda" ><a th:href="@{/bonos/cargar/?id=}+${o.idOperacion}"><span th:text="${#dates.format(o.fechaAccion, 'dd/MM/yyyy HH:mm')}"></span></a></td>
+								<td th:if="${o.capitalizacion} AND ${tipoTasa.equals('Nominal')} OR !${o.capitalizacion} AND ${tipoTasa.equals('Efectiva')}" class="text-center celda" ><a th:href="@{/bonos/cargar/?id=}+${o.idOperacion}"><span th:text="${#dates.format(o.fechaAccion, 'dd/MM/yyyy HH:mm')}"></span></a></td>
+								<td th:unless="${o.capitalizacion} AND ${tipoTasa.equals('Nominal')} OR !${o.capitalizacion} AND ${tipoTasa.equals('Efectiva')}" class="text-center celda" ><span th:text="${#dates.format(o.fechaAccion, 'dd/MM/yyyy HH:mm')}"></span></td>
 								<td class="text-center celda" th:text="${moneda} + ${o.nominal}"></td>
 								<td class="text-center celda" th:text="${moneda} + ${o.comercial}"></td>
 								<td class="text-center celda" th:text="${o.tasaInteres} + '%'"></td>
