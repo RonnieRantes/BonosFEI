@@ -14,7 +14,7 @@
     	<div th:replace="fragments/navbar :: nav"></div>
     	<form class="container cont1" th:action="@{/registro/registrar}" method="post" th:object="${usuario}">
 				<div class="form-group row perfil" style="margin-bottom: 4%;">
-					<h1 th:text="${titulo}"></h1>
+					<h1>Ajustes</h1>
 				</div>
 				<input class="form-control text-center" type="hidden" th:field="*{correoUsuario}"/>   
 				<input class="form-control text-center" type="hidden" th:field="*{contrasenia}"/>     
@@ -39,12 +39,9 @@
 						<h3>Tipo de tasa:</h3>
 					</div>
                     <div class="col-sm-6 colinput">
-                    	<select class="form-control text-center" th:field="*{tipoTasa.idTipoTasa}">
-							<option style="padding-right: 50px;" th:each="t: ${listaTipoTasas}"
-								th:value="${t.idTipoTasa}"
-								th:text="${t.nombre}"
-								th:selected="(${t.idTipoTasa} == *{tipoTasa.idTipoTasa})">
-							</option>	
+                    	<select class="form-control text-center" th:field="*{tipoTasa}">
+							<option style="text-align: center;" th:value="Efectiva" th:text="Efectiva"></option>
+			   				<option style="text-align: center;" th:value="Nominal" th:text="Nominal"></option>  
 						</select>
 					</div>
 				</div>
@@ -53,7 +50,7 @@
 						<a onclick="history.back()" class="btn btninvertido btnajustes">Cancelar</a>
 					</div>
 					<div class="col-sm-6 colajustes derecha">
-						<button type="submit" class="btn btn-primary btnajustes" th:text="${btn}"></button>  
+						<button type="submit" class="btn btn-primary btnajustes">Actualizar</button>  
 					</div>
 				</div>
                 <h4 th:text="${mensaje}" class="error"></h4>

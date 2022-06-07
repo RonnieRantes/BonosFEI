@@ -13,7 +13,7 @@
     <body>
     	<form class="container cont1" th:action="@{/registro/registrar}" method="post" th:object="${usuario}">
 			<div class="form-group row perfil" style="margin-bottom: 4%; padding-top: 5%;">
-				<h1 th:text="${titulo}"></h1>
+				<h1>Crea una cuenta</h1>
 			</div>
 			<div class="perfil2">
 				<div class="col-sm-6 coltexto">
@@ -54,19 +54,16 @@
 					th:selected="(${m.idMoneda} == *{moneda.idMoneda})">
 				</option>	
 			</select>			
-			<select class="form-control text-center" th:field="*{tipoTasa.idTipoTasa}" style="display:none;">
-				<option style="padding-right: 50px;" th:each="t: ${listaTipoTasas}"
-					th:value="${t.idTipoTasa}"
-					th:text="${t.nombre}"
-					th:selected="(${t.idTipoTasa} == *{tipoTasa.idTipoTasa})">
-				</option>	
+			<select class="form-control text-center" th:field="*{tipoTasa}" style="display:none;">
+				<option style="text-align: center;" th:value="Efectiva" th:text="Efectiva"></option>
+			    <option style="text-align: center;" th:value="Nominal" th:text="Nominal"></option>  
 			</select>
 			<div class="form-group row perfil" style="margin-top: 1%;">
 				<div class="col-sm-6 colajustes izquierda">
 					<a onclick="history.back()" class="btn btninvertido btnajustes">Cancelar</a>
 				</div>
 				<div class="col-sm-6 colajustes derecha">
-					<button type="submit" class="btn btn-primary btnajustes" th:text="${btn}"></button>  
+					<button type="submit" class="btn btn-primary btnajustes">Registrarse</button>  
 				</div>
 			</div>
             <h4 th:text="${mensaje}" class="error"></h4>

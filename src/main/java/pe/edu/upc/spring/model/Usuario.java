@@ -32,9 +32,8 @@ public class Usuario implements Serializable{
 	@JoinColumn(name="idMoneda", nullable=true)
 	private Moneda moneda;
 
-	@ManyToOne
-	@JoinColumn(name="idTipoTasa", nullable=true)
-	private TipoTasa tipoTasa;
+	@Column(name="tipoTasaUsuario",length=10,nullable=false)
+	private String tipoTasa;
 			
 	@Column(name="contraseniaUsuario",length=75,nullable=false)
 	private String contrasenia;
@@ -46,7 +45,7 @@ public class Usuario implements Serializable{
 		this.enabled = true;
 	}
 
-	public Usuario(String correoUsuario, String nombres, String apellidos, Rol rol, Moneda moneda, TipoTasa tipoTasa,
+	public Usuario(String correoUsuario, String nombres, String apellidos, Rol rol, Moneda moneda,
 			String contrasenia) {
 		super();
 		this.correoUsuario = correoUsuario;
@@ -54,7 +53,6 @@ public class Usuario implements Serializable{
 		this.apellidos = apellidos;
 		this.rol = rol;
 		this.moneda = moneda;
-		this.tipoTasa = tipoTasa;
 		this.contrasenia = contrasenia;
 		this.enabled = true;
 	}
@@ -99,14 +97,6 @@ public class Usuario implements Serializable{
 		this.moneda = moneda;
 	}
 
-	public TipoTasa getTipoTasa() {
-		return tipoTasa;
-	}
-
-	public void setTipoTasa(TipoTasa tipoTasa) {
-		this.tipoTasa = tipoTasa;
-	}
-
 	public String getContrasenia() {
 		return contrasenia;
 	}
@@ -121,5 +111,13 @@ public class Usuario implements Serializable{
 
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public String getTipoTasa() {
+		return tipoTasa;
+	}
+
+	public void setTipoTasa(String tipoTasa) {
+		this.tipoTasa = tipoTasa;
 	}
 }

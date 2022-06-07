@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pe.edu.upc.spring.model.Usuario;
 import pe.edu.upc.spring.service.IMonedaService;
 import pe.edu.upc.spring.service.IRolService;
-import pe.edu.upc.spring.service.ITipoTasaService;
 import pe.edu.upc.spring.service.IUsuarioService;
 
 @Controller
@@ -28,8 +27,6 @@ public class RegistroController {
 	@Autowired
 	private IRolService rService;
 	@Autowired
-	private ITipoTasaService tService;
-	@Autowired
 	private IUsuarioService uService;
 	@Autowired 
 	private PasswordEncoder encoder;
@@ -38,9 +35,6 @@ public class RegistroController {
 	public String irPaginaRegistro(Model model) throws ParseException{
 		model.addAttribute("usuario", new Usuario());
 		model.addAttribute("listaMonedas", mService.listar());
-		model.addAttribute("listaTipoTasas", tService.listar());
-		model.addAttribute("titulo", "Crea una cuenta");
-		model.addAttribute("btn", "Registrarse");
 		return "registro";
 	}
 	

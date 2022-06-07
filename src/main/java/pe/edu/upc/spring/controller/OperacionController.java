@@ -3,7 +3,9 @@ package pe.edu.upc.spring.controller;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.el.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,27 +16,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pe.edu.upc.spring.model.Bono;
 import pe.edu.upc.spring.model.Operacion;
-import pe.edu.upc.spring.service.IBonoService;
 import pe.edu.upc.spring.service.IFrecuenciaService;
 import pe.edu.upc.spring.service.IMonedaService;
 import pe.edu.upc.spring.service.IOperacionService;
-import pe.edu.upc.spring.service.ITipoTasaService;
 import pe.edu.upc.spring.service.IUsuarioService;
 
 @Controller
 @RequestMapping("/bonos")
-public class BonoController {
-	@Autowired
-	IBonoService bService;
+public class OperacionController {
 	@Autowired
 	IUsuarioService uService;
 	@Autowired
 	IFrecuenciaService fService;
 	@Autowired
 	IOperacionService oService;
-	@Autowired
-	ITipoTasaService tService;
 	@Autowired
 	IMonedaService mService;
 
@@ -53,33 +50,42 @@ public class BonoController {
 		if(binRes.hasErrors()) objRedir.addFlashAttribute("mensaje", "Ocurrio un error");
 		else {
 			if(objO.getFechaEmision() == null) return "redirect:/bonos/";
-			Operacion cmpbOperacion, objOperacion, ultOperacion;
-			ultOperacion = oService.ultimaOperacion(logeado.getName());
+			Operacion objOperacion;
+			objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
+
+			List<Bono> bonos;
 			//PRIMER CÁLCULO
 			if(objO.getListaBonos()==null) {
-				objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
-				cmpbOperacion = oService.registrar(objO);
-				objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null);
-				objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null));
+				//Registro datos entrada
+				objOperacion = oService.registrar(objO);
+
+				objOperacion = oService.CalcularIntermedios(objOperacion, uService.buscarId(logeado.getName()).getTipoTasa());
+				bonos = oService.CalcularBonos(objOperacion, new ArrayList<Bono>());
+				objOperacion = oService.CalcularIndicadores(objOperacion, bonos);
 			}
 			//SIGUIENTES CÁLCULOS
 			else {
-				//RECALCULAR CON TABLA
-				if(oService.compararOperaciones(ultOperacion, objO)) {
-					objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
-					cmpbOperacion = oService.registrar(objO);
-					objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), objO.getListaBonos());
-					objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), objO.getListaBonos()));
+				//RECALCULAR - SIN CAMBIOS EN DATOS DE ENTRADA
+				if(oService.compararOperaciones(oService.buscarId(objO.getIdOperacion()), objO)) {
+					//Registro datos entrada
+					objOperacion = oService.registrar(objO);
+
+					objOperacion = oService.CalcularIntermedios(objOperacion, uService.buscarId(logeado.getName()).getTipoTasa());
+					bonos = oService.CalcularBonos(objOperacion, objO.getListaBonos());
+					objOperacion = oService.CalcularIndicadores(objOperacion, bonos);
 				}
 				//CAMBIO EN DATOS ENTRADA
 				else{
+					//Registro datos entrada
 					objO.setIdOperacion(0);
-					objO.setCorreoUsuario(uService.buscarId(logeado.getName()));
-					cmpbOperacion = oService.registrar(objO);
-					objOperacion = oService.CalcularIndicadores(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null);
-					objOperacion.setListaBonos(oService.CalcularBonos(cmpbOperacion.getIdOperacion(), uService.buscarId(logeado.getName()).getTipoTasa().getIdTipoTasa(), null));
+					objOperacion = oService.registrar(objO);
+					
+					objOperacion = oService.CalcularIntermedios(objOperacion, uService.buscarId(logeado.getName()).getTipoTasa());
+					bonos = oService.CalcularBonos(objOperacion, new ArrayList<Bono>());
+					objOperacion = oService.CalcularIndicadores(objOperacion, bonos);
 				}
 			}
+			objOperacion.setListaBonos(bonos);
 			model.addAttribute("operacion", objOperacion);
 			model.addAttribute("listaBonos", objOperacion.getListaBonos());
 			//default
@@ -101,10 +107,7 @@ public class BonoController {
 	@RequestMapping("/eliminar")
 	public String eliminar(@RequestParam(value="id") int id, RedirectAttributes objRedir) {
 		try {
-			if(id>0){
-				oService.limpiarBonos(id);
-				oService.eliminar(id);
-			}
+			if(id>0) oService.eliminar(id);
 		}
 		catch(Exception ex) {
 			objRedir.addFlashAttribute("mensaje","Ocurrio un error");

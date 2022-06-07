@@ -32,6 +32,9 @@ public class Operacion implements Serializable {
 	@JoinColumn(name="correoUsuario", nullable=false)
 	private Usuario correoUsuario;
 	
+	@Column(name="diasAnioOperacion",nullable=false)
+	private int diasAnio;
+	
 	@Column(name="nominalOperacion",nullable=false)
 	private double nominal;
 
@@ -50,7 +53,7 @@ public class Operacion implements Serializable {
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="fechaAccion", nullable=false)
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm")
 	private Date fechaAccion;
 
 	@Temporal(TemporalType.DATE)
@@ -120,37 +123,6 @@ public class Operacion implements Serializable {
 	public double CostesIniciales() {
 		DecimalFormat twoDForm = new DecimalFormat("#.###");
 		return Double.valueOf(twoDForm.format(comercial * (flotacion/100 + cavali/100)));
-	}
-
-	public Operacion(int idOperacion, Usuario correoUsuario, double nominal, double comercial, double tasaInteres,
-			Frecuencia capitalizacion, double tasaDescuento, Date fechaEmision, int anios, Frecuencia frecuencia,
-			double prima, double flotacion, double cavali, double cOK, int periodos, double vna, double tir,
-			double trea, String prd, double bc, double convexidad, double duracion,
-			double duracionModificada) {
-		super();
-		this.idOperacion = idOperacion;
-		this.correoUsuario = correoUsuario;
-		this.nominal = nominal;
-		this.comercial = comercial;
-		this.tasaInteres = tasaInteres;
-		this.capitalizacion = capitalizacion;
-		this.tasaDescuento = tasaDescuento;
-		this.fechaEmision = fechaEmision;
-		this.anios = anios;
-		this.frecuencia = frecuencia;
-		this.prima = prima;
-		this.flotacion = flotacion;
-		this.cavali = cavali;
-		COK = cOK;
-		this.periodos = periodos;
-		this.vna = vna;
-		this.tir = tir;
-		this.trea = trea;
-		this.prd = prd;
-		this.bc = bc;
-		this.convexidad = convexidad;
-		this.duracion = duracion;
-		this.duracionModificada = duracionModificada;
 	}
 
 	public int getIdOperacion() {
@@ -420,8 +392,12 @@ public class Operacion implements Serializable {
 	public void setFechaAccion(Date fechaAccion) {
 		this.fechaAccion = fechaAccion;
 	}
-	
-	public boolean esCap() {
-		return capitalizacion != null;
+
+	public int getDiasAnio() {
+		return diasAnio;
+	}
+
+	public void setDiasAnio(int diasAnio) {
+		this.diasAnio = diasAnio;
 	}
 }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import pe.edu.upc.spring.service.IMonedaService;
 import pe.edu.upc.spring.service.IOperacionService;
-import pe.edu.upc.spring.service.ITipoTasaService;
 import pe.edu.upc.spring.service.IUsuarioService;
 
 @Controller
@@ -20,8 +19,6 @@ public class InterfazController {
 	IMonedaService mService;
 	@Autowired
 	IUsuarioService uService;
-	@Autowired
-	ITipoTasaService tService;
 	@Autowired
 	IOperacionService oService;
 
@@ -39,9 +36,6 @@ public class InterfazController {
 		model.addAttribute("user", uService.buscarId(logeado.getName()));
 		model.addAttribute("usuario", uService.buscarId(logeado.getName()));
 		model.addAttribute("listaMonedas", mService.listar());
-		model.addAttribute("listaTipoTasas", tService.listar());
-		model.addAttribute("titulo", "Ajustes");
-		model.addAttribute("btn", "Actualizar");
 		return "ajustes"; 
 	}
 	@GetMapping("/historial/")
@@ -49,7 +43,12 @@ public class InterfazController {
 		model.addAttribute("user", uService.buscarId(logeado.getName()));
 		model.addAttribute("listaOperaciones", oService.operacionesUsuario(logeado.getName()));
 		model.addAttribute("moneda", mService.buscarId(uService.buscarId(logeado.getName()).getMoneda().getIdMoneda()).getSimbolo());
+		model.addAttribute("tipoTasa", uService.buscarId(logeado.getName()).getTipoTasa());
 		return "historial"; 
 	}
-
+	@GetMapping("/limpiar/")
+	public String limpiarHistorial(Principal logeado, Model model) {
+		oService.limpiar(logeado.getName());
+		return "redirect:/historial/";
+	}
 }
