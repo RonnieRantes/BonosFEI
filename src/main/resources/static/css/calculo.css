@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lexend Deca'), url('https://fonts.cdnfonts.com/s/29848/LexendDecaRegular.woff') format('woff');
+}
 *{
 	font-family: Lexend Deca;
 }
