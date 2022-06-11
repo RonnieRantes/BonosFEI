@@ -288,7 +288,7 @@ h3{
 table.dataTable thead th {
 	background-color: #224957;
 	vertical-align: middle;
-	font-size: 5px;
+	font-size: 10pt;
 	width: 0px;
 	color: white;
 	border-color:#224957;
@@ -296,7 +296,7 @@ table.dataTable thead th {
 table.dataTable tbody td {
 	vertical-align: middle;
 	height: 1%;
-	font-size: 1px;
+	font-size: 8pt;
 	border-color:#224957;
 	border-width: 2px;
 }
